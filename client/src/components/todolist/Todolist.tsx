@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
-import { getLists, updateTodo, deleteTodo, updateStatus } from "../../services/Todolist";
+import { useState, useEffect } from "react";
+import { updateTodo, deleteTodo, updateStatus } from "../../services/Todolist";
+import { notification } from 'antd';
 interface Todo {
     id: number;
     title: string;
@@ -9,8 +10,12 @@ interface Todo {
     is_done: number;
 }
 
-function Todolist() {
-    const [todos, setTodos] = useState<Todo[]>([]);
+interface Props {
+    todos: Todo[];
+    setTodos: React.Dispatch<React.SetStateAction<Todo[]>>;
+}
+
+function Todolist({ todos, setTodos }: Props) {
     const [filteredTodos, setFilteredTodos] = useState<Todo[]>([]);
     const [keyword, setKeyword] = useState('');
     const [selectedId, setSelectedId] = useState<number | null>(null);
@@ -19,19 +24,6 @@ function Todolist() {
     const [description, setDescription] = useState("");
     const [dueDate, setDueDate] = useState("");
     const [priority, setPriority] = useState("normal");
-
-    useEffect(() => {
-        const getData = async () => {
-            try {
-                const response = await getLists();
-                setTodos(response.data);
-                setFilteredTodos(response.data);
-            } catch (error) {
-                console.error("Lỗi khi lấy danh sách:", error);
-            }
-        };
-        getData();
-    }, []);
 
     useEffect(() => {
         setFilteredTodos(todos);
@@ -104,6 +96,12 @@ function Todolist() {
                     selectedIds.includes(todo.id) ? { ...todo, is_done: 1 } : todo
                 )
             );
+            notification.success({
+                message: 'Thành công!',
+                description: 'Cập nhật trạng thái thành công.',
+                placement: 'topRight',
+                duration: 3,
+            });
             setSelectedIds([]);
         } catch (err) {
             console.error("Lỗi khi cập nhật trạng thái done:", err);
@@ -116,6 +114,12 @@ function Todolist() {
                 selectedIds.map(id => deleteTodo(id))
             );
             setTodos(prev => prev.filter(todo => !selectedIds.includes(todo.id)));
+            notification.success({
+                message: 'Thành công!',
+                description: 'Xóa thành công.',
+                placement: 'topRight',
+                duration: 3,
+            });
             setSelectedIds([]);
         } catch (err) {
             console.error("Lỗi khi xóa:", err);

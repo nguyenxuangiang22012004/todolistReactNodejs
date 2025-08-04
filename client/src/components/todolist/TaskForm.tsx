@@ -1,7 +1,11 @@
 import { useState } from "react";
 import { notification } from 'antd';
 import { addTasks } from "../../services/TaskForm";
-function TaskForm() {
+
+interface Props {
+  onAddSuccess: () => void;
+}
+function TaskForm({ onAddSuccess }: Props) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [dueDate, setDueDate] = useState("");
@@ -39,6 +43,7 @@ function TaskForm() {
         setDueDate("");
         setPriority("normal");
         setErrors({ title: false, description: false, dueDate: false });
+        onAddSuccess();
       })
       .catch((err) => {
         console.error("Lỗi khi gửi:", err);
